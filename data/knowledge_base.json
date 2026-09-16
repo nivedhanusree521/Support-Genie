@@ -1,0 +1,58 @@
+[
+  {
+    "id": "KB-001",
+    "title": "Resetting Your VPN Password",
+    "category": "VPN",
+    "keywords": ["vpn", "password", "reset", "login", "remote access"],
+    "content": "To reset your VPN password: 1) Go to https://vpn-portal.fictionalcorp.com/reset. 2) Enter your company email address. 3) You will receive a reset link valid for 15 minutes. 4) Choose a new password (minimum 10 characters, at least one number and one symbol). 5) Reconnect using the Cisco AnyConnect client with your new credentials. If the reset link does not arrive within 5 minutes, check your spam folder or contact IT to manually trigger a reset."
+  },
+  {
+    "id": "KB-002",
+    "title": "VPN Connection Fails or Times Out",
+    "category": "VPN",
+    "keywords": ["vpn", "not working", "connection failed", "timeout", "disconnect"],
+    "content": "If your VPN client fails to connect or times out: 1) Confirm you have an active internet connection. 2) Restart the AnyConnect client. 3) Ensure your VPN password has not expired (passwords expire every 90 days). 4) Disable any personal VPN or proxy software that may conflict. 5) If the issue persists after these steps, a support ticket should be raised with the error code shown in the client."
+  },
+  {
+    "id": "KB-003",
+    "title": "Setting Up a Network Printer",
+    "category": "Hardware",
+    "keywords": ["printer", "setup", "install printer", "network printer"],
+    "content": "To add a network printer: 1) Open Settings > Devices > Printers & Scanners. 2) Click 'Add a printer'. 3) Select the printer matching your floor (e.g., 'Floor3-HP-LaserJet'). 4) Install the driver if prompted. 5) Print a test page to confirm connectivity. If the printer does not appear in the list, confirm you are connected to the corporate network or VPN."
+  },
+  {
+    "id": "KB-004",
+    "title": "Requesting New Software Installation",
+    "category": "Software",
+    "keywords": ["software", "install", "application", "request software", "license"],
+    "content": "Employees who need new software installed should raise an IT ticket specifying the software name, version, and business justification. Manager approval is required for paid/licensed software. Standard approved software (browsers, PDF readers, communication tools) can be self-installed via the Company Software Center without a ticket."
+  },
+  {
+    "id": "KB-005",
+    "title": "Wi-Fi Connectivity Issues in Office",
+    "category": "Network",
+    "keywords": ["wifi", "wi-fi", "internet", "network", "connectivity", "slow internet"],
+    "content": "For Wi-Fi issues in the office: 1) Forget and reconnect to the 'FictionalCorp-Secure' network. 2) Confirm your device's Wi-Fi driver is up to date. 3) Try moving closer to an access point, as some floors have known weak-signal zones (documented on the IT wiki). 4) If multiple people on the same floor report issues, this likely indicates an access point outage and should be reported immediately as a ticket."
+  },
+  {
+    "id": "KB-006",
+    "title": "Account/Password Expiry Notifications",
+    "category": "Account",
+    "keywords": ["password expired", "account locked", "expiry", "login issue"],
+    "content": "Company account passwords expire every 90 days. You will receive an email reminder 7 days before expiry. To change your password proactively, use Ctrl+Alt+Delete > Change Password while connected to the corporate network or VPN. If your account becomes locked after failed login attempts, wait 15 minutes or contact IT for a manual unlock."
+  },
+  {
+    "id": "KB-007",
+    "title": "Requesting a Laptop Replacement",
+    "category": "Hardware",
+    "keywords": ["laptop", "replacement", "hardware issue", "broken laptop", "new laptop"],
+    "content": "Laptop replacement requests require a support ticket describing the hardware fault (e.g., battery failure, screen damage, repeated crashes). IT will first attempt diagnostics or a loaner laptop. Replacement approval typically takes 2-3 business days and requires manager sign-off for devices under 2 years old."
+  },
+  {
+    "id": "KB-008",
+    "title": "Setting Up Company Email on Mobile",
+    "category": "Email",
+    "keywords": ["email", "mobile", "outlook", "phone setup"],
+    "content": "To configure company email on a mobile device: 1) Install the Outlook mobile app. 2) Sign in with your company email and password. 3) Approve the multi-factor authentication prompt on your registered device. 4) Enable 'Sync Calendar' if needed. Personal devices must have a passcode/biometric lock enabled to comply with company security policy before email access is granted."
+  }
+]

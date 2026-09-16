@@ -1,0 +1,16 @@
+.env
+__pycache__/
+*.pyc
+.venv/
+venv/
+.streamlit/secrets.toml
+data/it_support.db
+data/checkpoints.db
+data/checkpoints.db-shm
+data/checkpoints.db-wal
+.pytest_cache/
+
+# Course/personal material -- not part of the project deliverables
+*.pdf
+*.docx
+Screenshot*.png

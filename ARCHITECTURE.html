@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SupportGenie — System Architecture</title>
+<style>
+  :root {
+    --bg: #f6f7fb;
+    --surface: #ffffff;
+    --text: #1a1f2e;
+    --muted: #5b6479;
+    --border: #e4e7ef;
+    --accent: #4f6df5;
+    --accent2: #7b5fe8;
+    --green: #1f9d55;
+    --orange: #e0810b;
+    --purple: #6a4fbf;
+    --code-bg: #0f1524;
+    --code-text: #d7e0ff;
+    --shadow: 0 1px 3px rgba(20,25,50,0.06), 0 8px 24px rgba(20,25,50,0.05);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    line-height: 1.65;
+    padding-block: 40px;
+  }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 0 24px; }
+
+  header.hero {
+    background: linear-gradient(135deg, #4f6df5 0%, #7b5fe8 55%, #6a4fbf 100%);
+    color: white;
+    border-radius: 20px;
+    padding: 48px 40px;
+    margin-bottom: 40px;
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+  }
+  header.hero::after {
+    content: "";
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 240px; height: 240px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 50%;
+  }
+  header.hero .eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: 12.5px;
+    opacity: 0.85;
+    font-weight: 600;
+  }
+  header.hero h1 {
+    font-size: 34px;
+    margin: 10px 0 12px;
+    font-weight: 800;
+  }
+  header.hero p {
+    max-width: 640px;
+    font-size: 16px;
+    opacity: 0.95;
+    margin: 0;
+  }
+  .badges { margin-top: 20px; display: flex; gap: 8px; flex-wrap: wrap; }
+  .badge {
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(255,255,255,0.35);
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 12.5px;
+    font-weight: 600;
+  }
+
+  nav.toc {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px 24px;
+    margin-bottom: 36px;
+    box-shadow: var(--shadow);
+  }
+  nav.toc h3 { margin: 0 0 10px; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
+  nav.toc ol { margin: 0; padding-left: 20px; columns: 2; column-gap: 24px; }
+  nav.toc li { margin-bottom: 6px; break-inside: avoid; }
+  nav.toc a { color: var(--accent); text-decoration: none; font-weight: 600; font-size: 14.5px; }
+  nav.toc a:hover { text-decoration: underline; }
+
+  section { margin-bottom: 48px; }
+  h2 {
+    font-size: 24px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 18px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--border);
+  }
+  h2 .num {
+    background: var(--accent);
+    color: white;
+    font-size: 14px;
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  h3 { font-size: 17px; font-weight: 700; margin: 26px 0 10px; color: var(--text); }
+  p { color: var(--text); margin: 10px 0; }
+  .lead { font-size: 16px; color: var(--muted); }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px 28px;
+    box-shadow: var(--shadow);
+    margin-bottom: 20px;
+  }
+
+  code {
+    background: #eef0fa;
+    padding: 2px 6px;
+    border-radius: 5px;
+    font-family: 'Cascadia Code', Consolas, monospace;
+    font-size: 0.9em;
+    color: #3a3fb5;
+  }
+  pre {
+    background: var(--code-bg);
+    color: var(--code-text);
+    padding: 18px 20px;
+    border-radius: 12px;
+    overflow-x: auto;
+    font-family: 'Cascadia Code', Consolas, monospace;
+    font-size: 13.5px;
+    line-height: 1.6;
+  }
+  pre code { background: none; color: inherit; padding: 0; }
+
+  table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 14.5px; }
+  thead th {
+    text-align: left;
+    background: #eef0fa;
+    color: var(--text);
+    padding: 10px 14px;
+    font-weight: 700;
+    border-bottom: 2px solid var(--border);
+  }
+  tbody td { padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tbody tr:hover { background: #fafbff; }
+
+  .pill-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+  .pill {
+    background: #eef0fa;
+    color: var(--accent);
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .diagram-box {
+    background: #101527;
+    border-radius: 16px;
+    padding: 28px;
+    overflow-x: auto;
+    box-shadow: var(--shadow);
+  }
+  .diagram-box svg { display: block; margin: 0 auto; min-width: 720px; }
+
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 18px 0; }
+  .mini-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: var(--shadow);
+  }
+  .mini-card .icon { font-size: 22px; }
+  .mini-card h4 { margin: 8px 0 4px; font-size: 14.5px; }
+  .mini-card p { font-size: 13px; color: var(--muted); margin: 0; }
+
+  .accordion { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 12px; background: var(--surface); box-shadow: var(--shadow); }
+  .accordion summary {
+    cursor: pointer;
+    padding: 16px 20px;
+    font-weight: 700;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    list-style: none;
+  }
+  .accordion summary::-webkit-details-marker { display: none; }
+  .accordion summary::before { content: "▸"; color: var(--accent); transition: transform 0.15s; }
+  .accordion[open] summary::before { transform: rotate(90deg); }
+  .accordion .body { padding: 0 20px 20px; color: var(--text); }
+  .file-tag {
+    font-family: 'Cascadia Code', Consolas, monospace;
+    background: var(--code-bg);
+    color: #8fd3ff;
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 12.5px;
+    margin-left: auto;
+  }
+
+  .callout {
+    border-left: 4px solid var(--accent);
+    background: #eef1ff;
+    padding: 14px 18px;
+    border-radius: 8px;
+    font-size: 14.5px;
+    margin: 16px 0;
+  }
+  .callout.green { border-color: var(--green); background: #eaf7ee; }
+  .callout.orange { border-color: var(--orange); background: #fff4e6; }
+
+  .tree {
+    background: var(--code-bg);
+    color: var(--code-text);
+    border-radius: 12px;
+    padding: 20px 24px;
+    font-family: 'Cascadia Code', Consolas, monospace;
+    font-size: 13px;
+    line-height: 1.85;
+    overflow-x: auto;
+  }
+  .tree .dir { color: #8fd3ff; font-weight: 700; }
+  .tree .comment { color: #7c8aad; }
+  .tree .file { color: #d7e0ff; }
+
+  .struct-table td:first-child { white-space: nowrap; font-family: 'Cascadia Code', Consolas, monospace; font-size: 13px; color: var(--accent); font-weight: 700; }
+
+  footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+    padding-top: 30px;
+    border-top: 1px solid var(--border);
+  }
+
+  @media (max-width: 640px) {
+    header.hero { padding: 32px 22px; }
+    header.hero h1 { font-size: 26px; }
+    nav.toc ol { columns: 1; }
+    .grid-3 { grid-template-columns: 1fr; }
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0d0f16;
+      --surface: #171a26;
+      --text: #eef0fa;
+      --muted: #9aa2b8;
+      --border: #2a2f42;
+      --shadow: 0 1px 3px rgba(0,0,0,0.4), 0 8px 24px rgba(0,0,0,0.35);
+    }
+    code { background: #232841; color: #b9c4ff; }
+    thead th { background: #232841; }
+    .pill { background: #232841; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="eyebrow">GenAI Development Program · Final Capstone · Project 3</div>
+    <h1>🧞 SupportGenie</h1>
+    <p>A deep architectural walkthrough of an agentic AI system built with LangGraph — tool calling, conditional routing, persistent state, and grounded, hallucination-resistant responses over local data.</p>
+    <div class="badges">
+      <span class="badge">🧠 LangGraph</span>
+      <span class="badge">🔗 LangChain</span>
+      <span class="badge">🤖 OpenAI (gpt-4o-mini)</span>
+      <span class="badge">🗄️ SQLite</span>
+      <span class="badge">🖥️ Streamlit</span>
+      <span class="badge">✅ Pydantic</span>
+    </div>
+  </header>
+
+  <nav class="toc">
+    <h3>Contents</h3>
+    <ol>
+      <li><a href="#overview">High-Level Architecture</a></li>
+      <li><a href="#lifecycle">Full Request Lifecycle</a></li>
+      <li><a href="#components">Component Breakdown</a></li>
+      <li><a href="#structure">Project Structure</a></li>
+      <li><a href="#stack">Technology Stack &amp; Rationale</a></li>
+      <li><a href="#dataflow">Data Flow Summary</a></li>
+      <li><a href="#scoring">Why This Design Fits the Brief</a></li>
+    </ol>
+  </nav>
+
+  <section id="overview">
+    <h2><span class="num">1</span> High-Level Architecture</h2>
+    <p class="lead">A user message enters a LangGraph loop where an LLM decides whether it needs a tool, a tool node runs exactly the tool(s) requested against local JSON/SQLite data, and the loop repeats until the LLM is ready to produce a final, grounded answer — with the whole conversation persisted so context carries across turns.</p>
+
+    <div class="diagram-box">
+      <svg viewBox="0 0 1000 620" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, sans-serif">
+        <defs>
+          <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L0,6 L9,3 z" fill="#8b93ad"/>
+          </marker>
+          <marker id="arrowBlue" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L0,6 L9,3 z" fill="#4f6df5"/>
+          </marker>
+        </defs>
+
+        <!-- User -->
+        <rect x="410" y="10" width="180" height="50" rx="12" fill="#4f6df5"/>
+        <text x="500" y="40" fill="#fff" font-size="15" font-weight="700" text-anchor="middle">👤 Employee (Streamlit)</text>
+
+        <line x1="500" y1="60" x2="500" y2="95" stroke="#8b93ad" stroke-width="2" marker-end="url(#arrow)"/>
+
+        <!-- UI Layer -->
+        <rect x="360" y="95" width="280" height="50" rx="12" fill="#1f2a44"/>
+        <text x="500" y="125" fill="#fff" font-size="14" font-weight="700" text-anchor="middle">🖥️ app.py — Streamlit UI</text>
+
+        <line x1="500" y1="145" x2="500" y2="180" stroke="#8b93ad" stroke-width="2" marker-end="url(#arrow)"/>
+
+        <!-- Graph container -->
+        <rect x="140" y="180" width="720" height="290" rx="18" fill="none" stroke="#3a4160" stroke-width="2" stroke-dasharray="6,4"/>
+        <text x="165" y="205" fill="#9aa2c9" font-size="12.5" font-weight="700">LANGGRAPH STATEGRAPH (src/graph.py)</text>
+
+        <!-- agent node -->
+        <rect x="380" y="225" width="240" height="55" rx="12" fill="#1f9d55"/>
+        <text x="500" y="250" fill="#fff" font-size="14" font-weight="700" text-anchor="middle">🤖 agent node</text>
+        <text x="500" y="267" fill="#e6ffe9" font-size="11" text-anchor="middle">ChatOpenAI + bind_tools()</text>
+
+        <!-- router diamond -->
+        <polygon points="500,300 560,335 500,370 440,335" fill="#2b3350" stroke="#5865a5" stroke-width="1.5"/>
+        <text x="500" y="330" fill="#fff" font-size="11" text-anchor="middle">tool_calls</text>
+        <text x="500" y="343" fill="#fff" font-size="11" text-anchor="middle">present?</text>
+
+        <!-- tools node -->
+        <rect x="380" y="400" width="240" height="55" rx="12" fill="#e0810b"/>
+        <text x="500" y="425" fill="#fff" font-size="14" font-weight="700" text-anchor="middle">🛠️ tools node</text>
+        <text x="500" y="442" fill="#fff6e9" font-size="10" text-anchor="middle">ToolNode([search, lookup, create, register])</text>
+
+        <!-- END -->
+        <rect x="700" y="312" width="120" height="46" rx="20" fill="#3a4160"/>
+        <text x="760" y="340" fill="#fff" font-size="13" font-weight="700" text-anchor="middle">END</text>
+
+        <!-- edges within graph -->
+        <line x1="500" y1="280" x2="500" y2="300" stroke="#8b93ad" stroke-width="2" marker-end="url(#arrow)"/>
+        <line x1="560" y1="335" x2="700" y2="335" stroke="#8b93ad" stroke-width="2" marker-end="url(#arrow)"/>
+        <text x="625" y="325" fill="#c9cee0" font-size="11">no</text>
+
+        <line x1="500" y1="370" x2="500" y2="400" stroke="#8b93ad" stroke-width="2" marker-end="url(#arrow)"/>
+        <text x="510" y="390" fill="#c9cee0" font-size="11">yes</text>
+
+        <!-- loop back tools -> agent -->
+        <path d="M380,427 C280,427 280,252 380,252" fill="none" stroke="#4f6df5" stroke-width="2" marker-end="url(#arrowBlue)"/>
+        <text x="230" y="340" fill="#8fb0ff" font-size="11" text-anchor="middle" transform="rotate(-90 230 340)">ToolMessage appended</text>
+
+        <!-- Memory saver -->
+        <rect x="140" y="490" width="230" height="55" rx="12" fill="#374151"/>
+        <text x="255" y="513" fill="#fff" font-size="12.5" font-weight="700" text-anchor="middle">💾 SqliteSaver</text>
+        <text x="255" y="530" fill="#d1d5db" font-size="10.5" text-anchor="middle">persists AgentState by thread_id</text>
+        <line x1="370" y1="517" x2="500" y2="470" stroke="#6b7280" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arrow)"/>
+
+        <!-- data stores -->
+        <rect x="630" y="490" width="180" height="55" rx="12" fill="#6a4fbf"/>
+        <text x="720" y="513" fill="#fff" font-size="12.5" font-weight="700" text-anchor="middle">📚 knowledge_base.json</text>
+        <text x="720" y="530" fill="#ece6ff" font-size="10" text-anchor="middle">read on every query</text>
+        <line x1="620" y1="455" x2="700" y2="490" stroke="#8b93ad" stroke-width="2" marker-end="url(#arrow)"/>
+
+        <rect x="820" y="490" width="150" height="55" rx="12" fill="#6a4fbf"/>
+        <text x="895" y="513" fill="#fff" font-size="12.5" font-weight="700" text-anchor="middle">🗄️ it_support.db</text>
+        <text x="895" y="530" fill="#ece6ff" font-size="10" text-anchor="middle">employees, tickets</text>
+        <text x="895" y="558" fill="#c9b8ff" font-size="9.5" text-anchor="middle">reads + writes (create_ticket,</text>
+        <text x="895" y="570" fill="#c9b8ff" font-size="9.5" text-anchor="middle">register_employee)</text>
+        <line x1="620" y1="445" x2="860" y2="490" stroke="#8b93ad" stroke-width="2" marker-end="url(#arrow)"/>
+
+        <!-- Final answer back up -->
+        <path d="M760,358 C760,560 500,590 500,470" fill="none" stroke="#4f6df5" stroke-width="2" stroke-dasharray="5,3" marker-end="url(#arrowBlue)"/>
+        <text x="900" y="600" fill="#8fb0ff" font-size="11" text-anchor="end">final answer → UI → user</text>
+      </svg>
+    </div>
+  </section>
+
+  <section id="lifecycle">
+    <h2><span class="num">2</span> Full Request Lifecycle — Example</h2>
+    <p>Walking through <em>"My VPN is not working, please raise a ticket"</em> end to end:</p>
+    <div class="card">
+      <ol>
+        <li><strong>User → UI:</strong> message typed into the Streamlit chat input.</li>
+        <li><strong>UI → Graph:</strong> <code>graph.invoke({"messages":[HumanMessage(...)]}, {"configurable":{"thread_id": ...}})</code>.</li>
+        <li><strong>Graph → LLM:</strong> system prompt + full message history sent to <code>gpt-4o-mini</code> with the 4 tools bound.</li>
+        <li><strong>LLM decides:</strong> if <code>employee_id</code>/<code>description</code> are incomplete, it responds with a clarifying question and <em>no</em> tool call → routed straight to <code>END</code> (note: the LLM classifies the <code>category</code> itself from the description — it never asks the user for it).</li>
+        <li><strong>Once complete:</strong> LLM emits a <code>create_ticket</code> tool call → routed to the <code>tools</code> node.</li>
+        <li><strong>Tool executes:</strong> validates the employee exists, checks for a duplicate open ticket, inserts a new row into SQLite, returns a structured JSON result.</li>
+        <li><strong>Loop back:</strong> the tool's <code>ToolMessage</code> is appended to state and control returns to the <code>agent</code> node.</li>
+        <li><strong>Final answer:</strong> the LLM reads the tool result and phrases a natural-language confirmation — never raw JSON.</li>
+        <li><strong>UI renders:</strong> the answer plus a "🔧 Tool activity" panel showing exactly what was called and what it returned.</li>
+      </ol>
+    </div>
+    <div class="callout green">✅ This is exactly what "State → Routing → Multi-Step Workflow" means in practice: the agent can branch (ask vs. act), loop (tool → agent), and remember (checkpointed state) — not just answer in one shot.</div>
+
+    <h3>🆕 New-Employee Onboarding Flow</h3>
+    <p>The seeded <code>employees.json</code> is a <em>starting</em> directory, not a hard limit. A fourth tool, <code>register_employee</code>, lets the agent create a real row in SQLite on demand:</p>
+    <div class="card">
+      <ol>
+        <li><strong>User:</strong> "I'm a new employee, I don't have an ID."</li>
+        <li><strong>Agent (no tool call):</strong> asks <em>only</em> for first name, last name, and department/role — never email or employee ID.</li>
+        <li><strong>User:</strong> "Vikram Rao, Operations."</li>
+        <li><strong>Agent → <code>register_employee</code>:</strong> always succeeds — it counts existing employees whose email already matches <code>vikram_rao(\d*)@xyz.com</code>; here that's 0, so the email is <code>vikram_rao@xyz.com</code> (a 2nd "Vikram Rao" would get <code>vikram_rao1@xyz.com</code>, a 3rd <code>vikram_rao2@xyz.com</code>, and so on) — then inserts a new row with a <strong>server-generated</strong> <code>EMP####</code> ID. Neither value is ever invented by the LLM, and a shared name never blocks registration.</li>
+        <li><strong>Agent:</strong> "You're registered as EMP7421. How can I help?"</li>
+        <li><strong>User:</strong> "My laptop won't turn on, please raise a ticket."</li>
+        <li><strong>Agent → <code>create_ticket</code>:</strong> uses <code>EMP7421</code> automatically — no need to re-ask, because the conversation state (persisted via <code>SqliteSaver</code>) already carries it.</li>
+      </ol>
+    </div>
+    <div class="callout">🔒 <strong>Key safety property:</strong> employee IDs and ticket IDs are always generated inside <code>db.py</code>, never by the LLM — so the model cannot guess, invent, or duplicate an ID, and every registration lands as a real, queryable row in <code>it_support.db</code>.</div>
+    <div class="callout orange">👥 <strong>Business rule: names can repeat, registrations never block.</strong> Any number of employees may share an identical first and last name — <code>register_employee</code> always creates a new record rather than refusing or asking the agent to "resolve" a clash. Uniqueness lives entirely on the <strong>email</strong>, disambiguated with an incrementing suffix: 1st "Jane Doe" → <code>jane_doe@xyz.com</code>, 2nd → <code>jane_doe1@xyz.com</code>, 3rd → <code>jane_doe2@xyz.com</code>. Each still gets its own independent <code>EMP####</code> ID.</div>
+  </section>
+
+  <section id="components">
+    <h2><span class="num">3</span> Component-by-Component Breakdown</h2>
+
+    <details class="accordion" open>
+      <summary>🖥️ Presentation Layer <span class="file-tag">app.py</span></summary>
+      <div class="body">
+        <p>Renders the chat UI plus a <strong>persistent multi-chat sidebar</strong> backed by SQLite: every chat has its own <code>chat_id</code> (row in the <code>chats</code> table — title + rendered history) and <code>thread_id</code> (key into the LangGraph checkpointer). Invokes the graph on every message, unpacks the returned messages to show a transparent "Tool activity" trace, and saves the updated history back to <code>chats</code>. A <code>🗑️</code> button next to each chat permanently deletes both its row and its LangGraph state. Wraps everything in <code>try/except</code> so failures degrade to a friendly error instead of a crash.</p>
+        <p><strong>Why Streamlit:</strong> the brief recommends it explicitly, and it delivers chat + history + reset + result-visibility with minimal code, keeping focus on the agent logic.</p>
+      </div>
+    </details>
+
+    <details class="accordion">
+      <summary>⚙️ Configuration Layer <span class="file-tag">src/config.py</span></summary>
+      <div class="body">
+        <p>Loads <code>OPENAI_API_KEY</code>, <code>OPENAI_MODEL</code>, <code>LLM_TEMPERATURE</code>, and <code>EMAIL_DOMAIN</code> (used to auto-generate new employee emails) from <code>.env</code> via <code>python-dotenv</code>, and centralizes every file path (data dir, DB path, JSON seed files). No other file hard-codes a secret, domain, or path — everything is portable and testable from one source of truth.</p>
+      </div>
+    </details>
+
+    <details class="accordion">
+      <summary>🗄️ Persistence Layer <span class="file-tag">src/db.py</span></summary>
+      <div class="body">
+        <p>Defines <code>employees</code>, <code>tickets</code>, and <code>chats</code> tables, auto-seeds employees/tickets from JSON on first run (idempotent), and exposes focused helpers: <code>get_employee</code>, <code>generate_unique_employee_email</code>, <code>create_employee</code>, <code>find_tickets</code>, <code>find_open_ticket_for_duplicate_check</code>, <code>create_ticket</code>, plus <code>create_chat</code> / <code>list_chats</code> / <code>get_chat</code> / <code>update_chat</code> / <code>delete_chat</code> for the sidebar's persistent chat list. Generates unique <code>TCK-XXXX</code> ticket IDs and <code>EMP####</code> employee IDs server-side, each with collision checking — the LLM never supplies these values itself. <code>generate_unique_employee_email</code> counts existing employees whose email matches the requested name pattern and appends the next number, so repeated names never collide.</p>
+        <p><strong>Why SQLite:</strong> tickets and employees are relational — a real, embedded, zero-config database expresses filtering/inserts more honestly than hand-rolled JSON manipulation, and demonstrates genuine local database integration.</p>
+      </div>
+    </details>
+
+    <details class="accordion">
+      <summary>📚 Reference Data <span class="file-tag">data/knowledge_base.json</span></summary>
+      <div class="body">
+        <p>A flat JSON array of IT articles tagged with keywords for matching. Static and read-only, so plain JSON is the right level of complexity — it also contrasts cleanly with the writable, relational ticket data in SQLite.</p>
+      </div>
+    </details>
+
+    <details class="accordion">
+      <summary>🛠️ Agent Tools <span class="file-tag">src/tools.py</span></summary>
+      <div class="body">
+        <p>Four <code>@tool</code>-decorated functions, each with a Pydantic input schema and a docstring that doubles as the LLM's usage instructions.</p>
+        <table>
+          <thead><tr><th>Tool</th><th>Schema</th><th>Guardrail</th></tr></thead>
+          <tbody>
+            <tr><td><code>knowledge_search</code></td><td><code>query</code></td><td>Returns <code>found: false</code> rather than fabricating an answer</td></tr>
+            <tr><td><code>ticket_lookup</code></td><td><code>employee_id?, ticket_id?, keyword?</code></td><td>Requires at least one search criterion</td></tr>
+            <tr><td><code>create_ticket</code></td><td><code>employee_id, category, description</code></td><td>Rejects unknown employees; flags duplicates instead of auto-creating; category is <strong>self-classified by the LLM</strong> from the description, never asked of the user, and normalized to a fixed allow-list</td></tr>
+            <tr><td><code>register_employee</code></td><td><code>first_name, last_name, department</code></td><td>Email auto-generated as <code>firstname_lastname@xyz.com</code> (incrementing a suffix if the name repeats) — never asked of the user; always creates a new record, never blocks on a shared name; ID always server-generated</td></tr>
+          </tbody>
+        </table>
+        <p>Every tool wraps its logic in <code>try/except</code>, returning a structured error dict instead of raising — the graph never crashes on a bad call.</p>
+        <div class="callout">🆕 <strong><code>register_employee</code></strong> is what makes the system open-ended: any user can identify as new, supply just their first name, last name and department, and be inserted into the real database — the email and employee ID are always generated by the system, never typed or invented, and a name that's already in use just gets the next numeric email suffix rather than being rejected — after which they can look up or create tickets exactly like a pre-seeded employee.</div>
+      </div>
+    </details>
+
+    <details class="accordion">
+      <summary>🧩 Conversation State <span class="file-tag">src/state.py</span></summary>
+      <div class="body">
+        <pre><code>class AgentState(TypedDict):
+    messages: Annotated[list, add_messages]
+    employee_id: Optional[str]</code></pre>
+        <p><code>add_messages</code> is LangGraph's reducer that automatically appends each node's new messages to the running history — the backbone of both tool-calling and multi-turn memory.</p>
+      </div>
+    </details>
+
+    <details class="accordion">
+      <summary>🧠 Orchestration Layer <span class="file-tag">src/graph.py</span></summary>
+      <div class="body">
+        <p>The heart of the system. Wires an <code>agent</code> node (LLM + bound tools), a <code>tools</code> node (<code>ToolNode</code>), a conditional edge (<code>tools_condition</code>) that routes to tools only when a tool call is present, a loop-back edge so the agent phrases the final answer after seeing tool output, and a <code>SqliteSaver</code> checkpointer keyed by <code>thread_id</code> for persistent state.</p>
+        <p>The <strong>system prompt</strong> encodes every safety rule from the brief: never invent information, collect all required fields before creating a ticket <em>or</em> registering a new employee, self-classify the ticket category from the description instead of asking the user, ask <em>only</em> for first name/last name/department when registering (never email or employee ID — both are system-generated), offer to register the user when their employee ID isn't found instead of giving up, surface duplicate warnings, and report tool errors plainly.</p>
+      </div>
+    </details>
+
+    <details class="accordion">
+      <summary>📋 Observability <span class="file-tag">src/logging_config.py</span></summary>
+      <div class="body">
+        <p>A single shared logger used by every module — DB seeding, tool calls with their arguments, ticket creation, exceptions — giving a clear audit trail of every decision the agent made, without extra dependencies.</p>
+      </div>
+    </details>
+
+    <details class="accordion">
+      <summary>✅ Verification <span class="file-tag">tests/test_tools.py</span></summary>
+      <div class="body">
+        <p>LLM-independent smoke tests covering the happy path, "not found", unknown-employee rejection, duplicate-ticket detection, successful registration (immediately followed by creating a ticket under the new ID), duplicate-email detection, and missing-field rejection — 11 tests across all four tools, proving correctness in isolation before the non-deterministic LLM ever gets involved.</p>
+      </div>
+    </details>
+  </section>
+
+  <section id="structure">
+    <h2><span class="num">4</span> Project Structure</h2>
+    <p class="lead">Every file has exactly one job. Nothing is duplicated, nothing is hard-coded across files, and the layout separates <em>presentation</em> (app.py), <em>orchestration</em> (graph.py, state.py), <em>capabilities</em> (tools.py), <em>persistence</em> (db.py, data/) and <em>configuration/observability</em> (config.py, logging_config.py) into clean, independent layers.</p>
+
+    <div class="tree"><pre style="margin:0; background:none; padding:0; color:inherit; font:inherit;"><span class="dir">Final Capstone Project/</span>
+├── <span class="file">app.py</span>                       <span class="comment"># Streamlit entrypoint — chat UI, session/thread handling</span>
+├── <span class="file">requirements.txt</span>             <span class="comment"># pinned Python dependencies</span>
+├── <span class="file">.env.example</span>                 <span class="comment"># template for required environment variables</span>
+├── <span class="file">.gitignore</span>                   <span class="comment"># excludes .env, __pycache__, the generated SQLite file</span>
+├── <span class="file">README.md</span>                    <span class="comment"># setup, usage, sample I/O, design decisions</span>
+├── <span class="file">ARCHITECTURE.md</span> / <span class="file">.html</span>    <span class="comment"># this document, in Markdown and standalone HTML</span>
+├── <span class="dir">data/</span>
+│   ├── <span class="file">employees.json</span>           <span class="comment"># seed employee directory (6 sample employees)</span>
+│   ├── <span class="file">knowledge_base.json</span>       <span class="comment"># 8 IT knowledge base articles, keyword-tagged</span>
+│   ├── <span class="file">seed_tickets.json</span>         <span class="comment"># 5 sample pre-existing tickets (varied statuses)</span>
+│   ├── <span class="file">it_support.db</span>             <span class="comment"># auto-generated SQLite DB (gitignored) — employees, tickets, saved chats</span>
+│   └── <span class="file">checkpoints.db</span>            <span class="comment"># auto-generated SQLite DB (gitignored) — LangGraph conversation state</span>
+├── <span class="dir">src/</span>
+│   ├── <span class="file">config.py</span>                 <span class="comment"># env/config loading — API key, model name, file paths</span>
+│   ├── <span class="file">db.py</span>                     <span class="comment"># SQLite schema, seeding, and CRUD helper functions</span>
+│   ├── <span class="file">tools.py</span>                  <span class="comment"># the 4 agent tools — Pydantic schemas + logic + guardrails</span>
+│   ├── <span class="file">state.py</span>                  <span class="comment"># LangGraph AgentState (TypedDict) definition</span>
+│   ├── <span class="file">graph.py</span>                  <span class="comment"># the StateGraph — nodes, conditional edges, system prompt</span>
+│   └── <span class="file">logging_config.py</span>         <span class="comment"># shared logger used across every module</span>
+├── <span class="dir">sample_outputs/</span>
+│   └── <span class="file">sample_conversation.md</span>    <span class="comment"># example transcript covering all 4 tools + memory</span>
+└── <span class="dir">tests/</span>
+    └── <span class="file">test_tools.py</span>             <span class="comment"># smoke tests for all 4 tools (no API key required)</span></pre></div>
+
+    <h3>What lives where, and why</h3>
+    <table class="struct-table">
+      <thead><tr><th>Path</th><th>Layer</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td>app.py</td><td>Presentation</td><td>The only file that knows about Streamlit — renders chat, the persistent multi-chat sidebar (new/switch/delete), tool-activity panel, and error states.</td></tr>
+        <tr><td>src/graph.py</td><td>Orchestration</td><td>Defines the LangGraph nodes/edges and the system prompt — the agent's "brain wiring".</td></tr>
+        <tr><td>src/state.py</td><td>Orchestration</td><td>The typed shape of everything the graph remembers between turns.</td></tr>
+        <tr><td>src/tools.py</td><td>Capabilities</td><td>The only file the LLM can actually "act" through — each function is a capability with validated inputs.</td></tr>
+        <tr><td>src/db.py</td><td>Persistence</td><td>All SQL lives here; tools.py never writes raw queries.</td></tr>
+        <tr><td>data/*.json</td><td>Persistence (seed/reference)</td><td>Human-editable sample data an evaluator can inspect or extend directly.</td></tr>
+        <tr><td>src/config.py</td><td>Configuration</td><td>Single source of truth for secrets, model name, and paths — no hard-coding elsewhere.</td></tr>
+        <tr><td>src/logging_config.py</td><td>Observability</td><td>One shared logger instance imported everywhere logging is needed.</td></tr>
+        <tr><td>tests/test_tools.py</td><td>Verification</td><td>Validates the capability layer independently of the (non-deterministic) LLM.</td></tr>
+        <tr><td>sample_outputs/</td><td>Documentation</td><td>Proof of end-to-end behavior without requiring a live demo to inspect it.</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout">🧱 <strong>Why this layering matters:</strong> each layer can be understood, tested, and modified independently — e.g. swapping SQLite for Postgres would only touch <code>db.py</code>; swapping OpenAI for a local model would only touch <code>graph.py</code>; none of it would require changing <code>tools.py</code> or <code>app.py</code> at all. This is exactly the "clean, modular and understandable code" the assignment calls for.</div>
+  </section>
+
+  <section id="stack">
+    <h2><span class="num">5</span> Technology Stack &amp; Rationale</h2>
+    <table>
+      <thead><tr><th>Technology</th><th>Role</th><th>Why this, specifically</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Python 3.11+</strong></td><td>Implementation language</td><td>Required by the brief; the native ecosystem for LangGraph/LangChain</td></tr>
+        <tr><td><strong>LangGraph</strong></td><td>Agent orchestration — state, nodes, conditional routing, tool loop</td><td>Explicitly required; turns multi-step agent behavior into a visible graph instead of one opaque LLM call</td></tr>
+        <tr><td><strong>LangChain Core</strong></td><td><code>@tool</code> + Pydantic schemas</td><td>Standard pattern for structured tool calling, integrates natively with LangGraph's <code>ToolNode</code></td></tr>
+        <tr><td><strong>langchain-openai</strong></td><td><code>ChatOpenAI</code> client</td><td>Native, reliable tool-calling support via <code>bind_tools</code></td></tr>
+        <tr><td><strong>OpenAI <code>gpt-4o-mini</code></strong></td><td>Reasoning, tool selection, response generation</td><td>Fast, inexpensive, strong tool-calling accuracy — no costly infra, matching the brief's constraints</td></tr>
+        <tr><td><strong>SQLite</strong></td><td>Employees &amp; tickets storage</td><td>Zero-config, single-file relational DB — ideal for a genuine "local data source" requirement</td></tr>
+        <tr><td><strong>JSON</strong></td><td>Knowledge base + seed data</td><td>Static, human-readable reference data with no relational needs</td></tr>
+        <tr><td><strong>Pydantic</strong></td><td>Tool input validation</td><td>Converts free-text LLM calls into type-checked structured arguments</td></tr>
+        <tr><td><strong>Streamlit</strong></td><td>Chat UI</td><td>Recommended by the brief; fastest path to a clean, functional interface</td></tr>
+        <tr><td><strong>python-dotenv</strong></td><td>Secret/env management</td><td>Keeps API keys out of source and version control</td></tr>
+        <tr><td><strong>Python <code>logging</code></strong></td><td>Observability</td><td>Standard-library, zero extra dependencies, satisfies the "basic logging" requirement</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="dataflow">
+    <h2><span class="num">6</span> Data Flow Summary</h2>
+    <div class="grid-3">
+      <div class="mini-card">
+        <div class="icon">🌱</div>
+        <h4>Seeding (once)</h4>
+        <p><code>employees.json</code> + <code>seed_tickets.json</code> → auto-inserted into <code>it_support.db</code> on first <code>init_db()</code> call.</p>
+      </div>
+      <div class="mini-card">
+        <div class="icon">🔎</div>
+        <h4>Read path</h4>
+        <p><code>knowledge_search</code> reads JSON directly; <code>ticket_lookup</code> runs a parameterized SQL <code>SELECT</code>.</p>
+      </div>
+      <div class="mini-card">
+        <div class="icon">✍️</div>
+        <h4>Write path</h4>
+        <p><code>create_ticket</code> validates, checks duplicates, then <code>INSERT</code>s a new row — the only write path in the system.</p>
+      </div>
+    </div>
+    <p>Every tool returns a structured dict → wrapped as a <code>ToolMessage</code> → fed back to the <code>agent</code> node → rendered as a grounded natural-language answer in the Streamlit UI.</p>
+  </section>
+
+  <section id="scoring">
+    <h2><span class="num">7</span> Why This Design Fits the Brief</h2>
+    <div class="callout">🎯 <strong>"Tool Calling → Agent → State → Routing → Multi-Step Workflow"</strong> maps directly onto this system: Pydantic tool schemas (Tool Calling), the <code>agent</code> node (Agent), <code>AgentState</code> + <code>SqliteSaver</code> (State), <code>tools_condition</code> (Routing), and the <code>agent ⇄ tools</code> loop (Multi-Step Workflow).</div>
+    <div class="callout orange">🔒 <strong>Safety first</strong> — the agent is architecturally prevented from creating a ticket with missing or invented information, and is nudged rather than forced to confirm before a likely duplicate.</div>
+    <div class="callout green">👁️ <strong>Transparent by design</strong> — every tool call and its raw result is visible in the UI's tool activity panel and in the logs, never hidden inside a single LLM response.</div>
+    <div class="callout">🌱 <strong>Open-ended, not a fixed demo dataset</strong> — the <code>register_employee</code> tool means the system isn't limited to the 6 seeded employees; anyone can onboard themselves through the chat and drive the full ticket lifecycle under their own identity.</div>
+    <div class="callout green">💾 <strong>Genuinely persistent, not just "for the demo"</strong> — both conversation memory (<code>SqliteSaver</code> → <code>checkpoints.db</code>) and the chat list itself (<code>chats</code> table → <code>it_support.db</code>) are backed by real SQLite files, so closing and restarting the app preserves every saved chat exactly as Streamlit apps in production would need to.</div>
+  </section>
+
+  <footer>
+    SupportGenie — Architecture Documentation · GenAI Development Program Final Capstone (Project 3)
+  </footer>
+
+</div>
+</body>
+</html>

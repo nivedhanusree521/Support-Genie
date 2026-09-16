@@ -1,0 +1,42 @@
+[
+  {
+    "ticket_id": "TCK-1001",
+    "employee_id": "EMP1003",
+    "category": "Hardware",
+    "description": "Laptop screen flickers intermittently and occasionally goes black for a few seconds.",
+    "status": "In Progress",
+    "created_at": "2026-08-20 10:15:00"
+  },
+  {
+    "ticket_id": "TCK-1002",
+    "employee_id": "EMP1002",
+    "category": "VPN",
+    "description": "Unable to connect to VPN from home network, client shows error code 442.",
+    "status": "Resolved",
+    "created_at": "2026-08-18 09:02:00"
+  },
+  {
+    "ticket_id": "TCK-1003",
+    "employee_id": "EMP1005",
+    "category": "Software",
+    "description": "Requesting installation of Adobe Photoshop for marketing collateral work.",
+    "status": "Open",
+    "created_at": "2026-09-01 14:30:00"
+  },
+  {
+    "ticket_id": "TCK-1004",
+    "employee_id": "EMP1001",
+    "category": "Network",
+    "description": "Wi-Fi drops repeatedly on the 4th floor finance wing.",
+    "status": "Open",
+    "created_at": "2026-09-05 11:45:00"
+  },
+  {
+    "ticket_id": "TCK-1005",
+    "employee_id": "EMP1003",
+    "category": "Hardware",
+    "description": "Laptop battery drains from 100% to 20% within an hour of unplugging.",
+    "status": "In Progress",
+    "created_at": "2026-09-08 16:20:00"
+  }
+]

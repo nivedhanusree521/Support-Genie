@@ -1,0 +1,38 @@
+[
+  {
+    "employee_id": "EMP1001",
+    "name": "Aditi Sharma",
+    "email": "aditi_sharma@xyz.com",
+    "department": "Finance"
+  },
+  {
+    "employee_id": "EMP1002",
+    "name": "Rahul Verma",
+    "email": "rahul_verma@xyz.com",
+    "department": "Sales"
+  },
+  {
+    "employee_id": "EMP1003",
+    "name": "Priya Nair",
+    "email": "priya_nair@xyz.com",
+    "department": "Engineering"
+  },
+  {
+    "employee_id": "EMP1004",
+    "name": "Karan Mehta",
+    "email": "karan_mehta@xyz.com",
+    "department": "Human Resources"
+  },
+  {
+    "employee_id": "EMP1005",
+    "name": "Sneha Iyer",
+    "email": "sneha_iyer@xyz.com",
+    "department": "Marketing"
+  },
+  {
+    "employee_id": "EMP1024",
+    "name": "Vikram Rao",
+    "email": "vikram_rao@xyz.com",
+    "department": "Operations"
+  }
+]
